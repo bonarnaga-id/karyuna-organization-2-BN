@@ -16,12 +16,11 @@ export const pool =
   globalForDb.__karyunaPostgresqlPool ??
   new Pool({
     connectionString: databaseUrl,
+    max: 10,
     ssl: databaseUrl.includes("neon.tech") ? { rejectUnauthorized: false } : undefined,
   });
 
-if (process.env.NODE_ENV !== "production") {
-  globalForDb.__karyunaPostgresqlPool = pool;
-}
+globalForDb.__karyunaPostgresqlPool = pool;
 
 export const db = drizzle(pool, { schema });
 export { schema };

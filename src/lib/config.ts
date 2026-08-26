@@ -1,7 +1,7 @@
 export const appConfig = {
   appName: process.env.NEXT_PUBLIC_APP_NAME ?? "Karyuna",
   logoUrl: process.env.NEXT_PUBLIC_LOGO_URL ?? "/assets/logo-karyuna.svg",
-  faviconUrl: process.env.NEXT_PUBLIC_FAVICON_URL ?? "/favicon.ico",
+  faviconUrl: process.env.NEXT_PUBLIC_FAVICON_URL ?? "/assets/logo-karyuna.svg",
   primaryColor: process.env.NEXT_PUBLIC_PRIMARY_COLOR ?? "#16a34a",
   organizationName: process.env.NEXT_PUBLIC_ORGANIZATION_NAME ?? "Karang Taruna Karyuna",
   address: process.env.NEXT_PUBLIC_ORGANIZATION_ADDRESS ?? "Jl. Gotong Royong No. 17, Desa Harmoni",
