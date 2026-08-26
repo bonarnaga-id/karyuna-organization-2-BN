@@ -1,8 +1,8 @@
 import { sql } from "drizzle-orm";
 import { db } from "@/db";
-import { jsonResponse } from "@/lib/security";
+import { jsonResponse, withApi } from "@/lib/security";
 
-export async function GET() {
+export const GET = withApi(async () => {
   await db.execute(sql`select 1`);
   return jsonResponse({ status: "sehat", aplikasi: "Karyuna", waktu: new Date().toISOString() });
-}
+});

@@ -68,3 +68,23 @@ export async function writeAuditLog(params: {
 export function safeError(message = "Permintaan tidak dapat diproses") {
   return jsonResponse({ error: message }, { status: 400 });
 }
+
+export function apiError(error: unknown) {
+  console.error("[Karyuna] Kesalahan API tidak tertangani:", error);
+  const isProduction = process.env.NODE_ENV === "production";
+  const message =
+    !isProduction && error instanceof Error
+      ? error.message
+      : "Terjadi kesalahan pada server. Periksa koneksi dan skema database.";
+  return jsonResponse({ error: message }, { status: 500 });
+}
+
+export function withApi(handler: (request: NextRequest) => Promise<Response> | Response) {
+  return async function (request: NextRequest) {
+    try {
+      return await handler(request);
+    } catch (error) {
+      return apiError(error);
+    }
+  };
+}

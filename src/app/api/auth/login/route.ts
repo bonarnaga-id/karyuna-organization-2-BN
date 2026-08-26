@@ -2,10 +2,10 @@ import { NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { createCsrfToken, createSessionToken, setAuthCookies, verifyPassword } from "@/lib/auth";
-import { checkRateLimit, jsonResponse, writeAuditLog } from "@/lib/security";
+import {checkRateLimit, jsonResponse, writeAuditLog, withApi } from "@/lib/security";
 import { loginSchema } from "@/lib/validators";
 
-export async function POST(request: NextRequest) {
+export const POST = withApi(async (request: NextRequest) => {
   if (!checkRateLimit(request, 8, 60_000)) {
     return jsonResponse({ error: "Terlalu banyak percobaan login. Coba lagi sebentar." }, { status: 429 });
   }
@@ -29,4 +29,4 @@ export async function POST(request: NextRequest) {
   await writeAuditLog({ userId: user.id, action: "LOGIN_BERHASIL", entity: "users", entityId: user.id, request });
 
   return jsonResponse({ user: { id: user.id, name: user.name, email: user.email, role: user.role }, csrfToken: csrf });
-}
+});

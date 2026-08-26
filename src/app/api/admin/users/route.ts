@@ -2,10 +2,10 @@ import { NextRequest } from "next/server";
 import { desc, eq, ilike, or, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { hashPassword, requireAuth } from "@/lib/auth";
-import { checkRateLimit, jsonResponse, validateCsrf, writeAuditLog } from "@/lib/security";
+import {checkRateLimit, jsonResponse, validateCsrf, writeAuditLog, withApi } from "@/lib/security";
 import { userSchema } from "@/lib/validators";
 
-export async function GET(request: NextRequest) {
+export const GET = withApi(async (request: NextRequest) => {
   const auth = await requireAuth(request, "akun");
   if (!auth.ok) return jsonResponse({ error: auth.message }, { status: auth.status });
   if (!checkRateLimit(request)) return jsonResponse({ error: "Terlalu banyak permintaan" }, { status: 429 });
@@ -14,9 +14,9 @@ export async function GET(request: NextRequest) {
   const data = await db.select({ id: schema.users.id, name: schema.users.name, email: schema.users.email, role: schema.users.role, isActive: schema.users.isActive, lastLoginAt: schema.users.lastLoginAt, createdAt: schema.users.createdAt }).from(schema.users).where(filter).orderBy(desc(schema.users.createdAt)).limit(50);
   const totalRows = await db.select({ count: sql<number>`count(*)::int` }).from(schema.users).where(filter);
   return jsonResponse({ data, total: totalRows[0]?.count ?? 0 });
-}
+});
 
-export async function POST(request: NextRequest) {
+export const POST = withApi(async (request: NextRequest) => {
   const auth = await requireAuth(request, "akun");
   if (!auth.ok) return jsonResponse({ error: auth.message }, { status: auth.status });
   if (!validateCsrf(request)) return jsonResponse({ error: "Token keamanan tidak valid" }, { status: 403 });
@@ -32,4 +32,4 @@ export async function POST(request: NextRequest) {
   }).returning({ id: schema.users.id, name: schema.users.name, email: schema.users.email, role: schema.users.role, isActive: schema.users.isActive });
   await writeAuditLog({ userId: auth.user.id, action: "BUAT_AKUN", entity: "users", entityId: user.id, request });
   return jsonResponse({ data: user }, { status: 201 });
-}
+});
