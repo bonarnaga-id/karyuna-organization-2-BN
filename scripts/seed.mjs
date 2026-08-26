@@ -1,4 +1,6 @@
-import 'dotenv/config';
+import { config } from 'dotenv';
+config();
+config({ path: '.env.local' });
 import bcrypt from 'bcryptjs';
 import pg from 'pg';
 
